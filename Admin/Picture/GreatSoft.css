@@ -1,0 +1,52 @@
+BODY
+{
+    FONT-SIZE: 14.8px
+}
+a:visited
+{  
+	color:blue; 
+	font-size: 14.8px; 
+	text-decoration: none
+}
+a:hover
+{  
+	color:red; 
+	font-size: 14.8px; 
+	text-decoration: underline
+}
+A:active
+{
+    COLOR: blue;
+    FONT-SIZE: 14.8px;
+}
+A:link
+{
+    COLOR: blue;
+    FONT-SIZE: 14.8px;
+    TEXT-DECORATION: none
+}
+INPUT
+{
+    FONT-SIZE: 14.8px
+}
+TEXTAREA
+{
+    FONT-SIZE: 14.8px
+}
+TD
+{
+    FONT-SIZE: 14.8px
+}
+SELECT
+{
+    FONT-SIZE: 14.8px
+}
+BUTTON
+{
+    COLOR: teal;
+    FONT-SIZE: 14.8px
+}
+.SELE
+{
+    BACKGROUND-COLOR: #FFDA99
+}

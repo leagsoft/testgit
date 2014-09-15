@@ -1,0 +1,179 @@
+<%
+'数据库链接
+Dim Conn
+Set Conn=Server.CreateObject("Adodb.Connection")
+Conn.ConnectionString="Provider=SQLOLEDB.1;Persist Security Info=False;User ID=sa;Initial Catalog=Webdata;Data Source=192.168.0.201;Pwd="
+Conn.Open
+
+Dim Connect2
+Set Connect2=Server.CreateObject("Adodb.Connection")
+Connect2.ConnectionString="Provider=SQLOLEDB.1;Persist Security Info=False;User ID=sa;Initial Catalog=PBC;Data Source=192.168.0.201;Pwd="
+Connect2.Open
+
+'Dim Connect
+'Set Connect=Server.CreateObject("Adodb.Connection")
+'Connect.ConnectionString="Provider=SQLOLEDB.1;Persist Security Info=False;User ID=sa;Initial Catalog=OA;Data Source=192.168.0.224;Pwd="
+'Connect.Open
+
+function encode(byval pwd)
+  '// 口令变换
+  '---------------------------------------------------------------
+  dim ii,leng,ch
+  '---------------------------------------------------------------
+  if(pwd="")then
+     encode="PASSWORD"
+     exit function
+     end if
+  if(pwd="PASSWORD")then
+     encode=""
+     exit function
+     end if
+  '---------------------------------------------------------------
+  leng=len(pwd)
+  for ii=1 to leng
+      ch=mid(pwd,ii,1)
+      '// if(asc(ch)>31 and asc(ch)<127)then pwd=left(pwd,ii-1)+chr(asc(ch) xor 15)+right(pwd,leng-ii)
+      if(asc(ch)>0 and asc(ch)<128)then pwd=left(pwd,ii-1)+chr(asc(ch) xor 15)+right(pwd,leng-ii)
+      next
+  encode=pwd
+  '---------------------------------------------------------------
+end function
+
+function format8date(byval pddate)
+  '// 显示yyyymmdd日期格式
+		dim strYear,strMonth,strDay
+		Dim strOutPutDate
+		IF isdate(pddate)  then
+			strYear=year(pddate)
+			strMonth=month(pddate)
+			strDay=day(pddate)
+			
+			strOutPutDay=strYear & Right("0" & strMonth,2) & right("0" & strDay,2)
+		else
+			strOutPutDay=""
+		end if
+		
+		format8date=strOutPutDay
+end function
+
+function getpurview(YHZL,YHQZ,QXGL,QXBJ,QXLL)
+  '// 根据用户种类、用户群组和权限参数判断用户的访问权限
+  '---------------------------------------------------------------
+  dim ii,temp
+  '---------------------------------------------------------------
+  getpurview=""
+  if(YHZL="管理员")then
+     getpurview="管理者"
+     exit function
+  end if
+  if(YHQZ="")then exit function
+  temp=split(YHQZ,",")
+  QXGL=","+QXGL+","
+  QXBJ=","+QXBJ+","
+  QXLL=","+QXLL+","
+  for ii=0 to ubound(temp)
+      if(instr(QXGL,","+temp(ii)+",")>0)then
+         getpurview="管理者"
+         exit function
+         end if
+      next
+  for ii=0 to ubound(temp)
+      if(instr(QXBJ,","+temp(ii)+",")>0)then
+         getpurview="编辑者"
+         exit function
+         end if
+      next
+  for ii=0 to ubound(temp)
+      if(instr(QXLL,","+temp(ii)+",")>0)then
+         getpurview="浏览者"
+         exit function
+         end if
+      next
+  '---------------------------------------------------------------
+end function
+
+function MyTime()
+  '// 按指定的格式显示日期/时间
+  '---------------------------------------------------------------
+  dim yy,mm,dd,hh,nn,ss
+  '---------------------------------------------------------------
+  yy = right("20" & Year(Date()),4)
+  mm = right("00" & Month(Date()),2)
+  dd = right("00" & Day(Date()),2)
+  hh = right("00" & hour(time()),2)
+  nn = right("00" & minute(time()),2)
+  ss = right("00" & second(time()),2)
+  MyTime = yy+"-"+mm+"-"+dd+" "+hh+":"+nn+":"+ss
+  '---------------------------------------------------------------
+end function
+
+function ReadValue(RSTemp,byval name)
+  '---------------------------------------------------------------
+  dim temp    '// 用到UserMC,UserP1
+  '---------------------------------------------------------------
+  if(name="YHP1")then
+     temp=UserMC
+
+     RSTemp.Open "select * from QZXX where QZYM like '%"+UserMC+"%'",Connect,1,1 '// 浏览
+     while not RSTemp.Eof
+        temp=temp+","+RSTemp("QZMC")
+        RSTemp.Movenext
+        wend
+     ReadValue=temp
+     end if
+  '---------------------------------------------------------------
+  if(name="YHP2")then
+     RSTemp.Open "select * from BDXX ",Connect,1,1
+     temp=""
+     while not RSTemp.Eof
+        if(intersect(",",RSTemp("BDLL"),UserP1)<>"")then temp=temp+RSTemp("BDMC")+","
+        RSTemp.Movenext
+        wend
+     if(temp<>"")then temp=left(temp,len(temp)-1)
+     ReadValue=temp
+     end if
+  '---------------------------------------------------------------
+  z=""
+  if(name="YHP3")then z="通讯录"
+  if(name="YHP4")then z="公告栏"
+  if(name="YHP5")then z="讨论区"
+  if(name="YHP6")then z="部门网页"
+  if(name="YHP7")then z="收藏夹"
+  if(name="YHP8")then z="万事通"
+  if(name="YHP9")then z="会议室"
+  if(z<>"")then
+     RSTemp.Open "select * from QXXX where QXZL='"+z+"'",Connect,1,1
+     temp=UserMC
+     if(z="公告栏" or z="讨论区" or z="会议室")then temp=""
+     if(z="部门网页")then temp="[借出]"+chr(5)+UserMC
+     if(z="通讯录")then temp=temp+chr(5)+"[内部]"
+     While not RSTemp.Eof
+        if(getpurview(UserZL,UserP1,RSTemp("QXGL"),RSTemp("QXBJ"),RSTemp("QXLL"))<>"")then temp=temp+chr(5)+RSTemp("QXMC")
+        RSTemp.Movenext
+        Wend
+     if(left(temp,1)=chr(5))then temp=right(temp,len(temp)-1)
+     ReadValue=temp
+     end if
+  '---------------------------------------------------------------
+  RSTemp.Close
+  '---------------------------------------------------------------
+end function
+
+function fileupload(byval ftype,byval d,byref filename)
+  '// ftype:"file","mail"
+  '// 返回：成功的文件名
+  '---------------------------------------------------------------
+  '// 用控件iNotes.Upload功能上传数据
+  Set oUpload = Server.CreateObject("iNotes.Upload")
+  oUpload.FilePath=Server.MapPath("file")
+  fileupload=false
+  if(instr(oUpload.Request("file"),":\")>0)then
+     filename=oUpload.FileName("file")
+     fileupload=oUpload.SaveFile("file",newfilename(ftype,d,filename))
+     end if
+  '---------------------------------------------------------------
+  '// 上传结束
+  set oUpload = nothing
+  '---------------------------------------------------------------
+end function
+%>

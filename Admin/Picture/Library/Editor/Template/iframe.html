@@ -1,0 +1,27 @@
+<html>
+<body>
+<iframe id="myIframe" style="HEIGHT: 300px; WIDTH: 600px"></iframe>
+<p>
+	<input type="button" value="show_template" onclick="showTemplate()">
+	<input type="button" value="changePicture" onclick="changePicture()">
+</p>
+<p><input type="file" name="myFile" onpropertychange=changePicture() id="myFile" style="HEIGHT: 22px; WIDTH: 500px"></p>	
+<p><input id="myText" size="100" ></p>
+</body>
+</html>
+<script language="javascript">		
+function showTemplate()
+{
+	myIframe.document.designMode="On";
+	document.all.myIframe.src="template.html";
+}
+function go()
+{
+	myText.value=myIframe.document.body.innerHTML;
+	
+}
+function changePicture()
+{
+	myIframe.document.all.myImg.src=myFile.value;
+}
+</script>

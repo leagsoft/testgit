@@ -1,0 +1,32 @@
+table {
+    font-size: 9pt;
+    line-height: 22px;
+}
+a:link {
+    text-decoration: none;
+    color: #000000;
+
+}
+a:visited {
+    text-decoration: none;
+    color: #000000;
+
+}
+a:hover {
+    text-decoration: none;
+    color: #FF9900;
+}
+a:active {
+    text-decoration: none;
+    color: #000000;
+
+}
+.Input {
+    border: thin solid #CCCCCC;
+    background-color: #f6f6f6;
+    height: 18px;
+    font-size: 9pt;
+
+
+
+}

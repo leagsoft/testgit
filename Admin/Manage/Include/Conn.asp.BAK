@@ -1,0 +1,7 @@
+<%
+'Êý¾Ý¿âÁ´½Ó
+Dim Conn
+Set Conn=Server.CreateObject("Adodb.Connection")
+Conn.ConnectionString="Provider=SQLOLEDB.1;Persist Security Info=False;User ID=sa;Initial Catalog=DadaCBRCGD;Data Source=oa-server2;Pwd=weboaadmin2004;"
+Conn.Open
+%>

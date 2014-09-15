@@ -1,0 +1,178 @@
+<html>
+<head>
+<title>DHTML Editor </title>
+
+<!-- Styles -->
+<link REL="stylesheet" TYPE="text/css" href="htmltoolstyle.css">
+
+<SCRIPT>
+<!--
+var bLoad=false
+var modified=true
+var bodyStyle="<BODY MONOSPACE STYLE=\"font:10pt arial,sans-serif\">"
+var bIsHtml=false
+
+public_description=new Editor
+
+function Editor() {
+  this.put_html=SetHtml;
+  this.get_html=GetHtml;
+  this.put_text=SetText;
+  this.get_text=GetText;
+  this.CompFocus=GetCompFocus;
+}
+
+function GetCompFocus() {
+  HtmlEditor.focus();
+}
+
+function GetText() {
+  return HtmlEditor.document.body.innerText;
+}
+
+function SetText(text) {
+  text = text.replace(/\n/g, "<br>")
+  HtmlEditor.document.body.innerHTML=text;
+}
+
+function GetHtml() {
+  if (bIsHtml) 
+    return HtmlEditor.document.body.innerText;
+  else {
+    cleanHtml();
+    return HtmlEditor.document.body.innerHTML;
+  }
+}
+
+function SetHtml(sVal) {
+  if (bIsHtml) HtmlEditor.document.body.innerText=sVal;
+  else HtmlEditor.document.body.innerHTML=sVal;
+}
+
+// -->
+</SCRIPT>
+</head>
+
+<body onload="bLoad=true" STYLE="MARGIN: 0pt; PADDING-BOTTOM: 2pt; PADDING-LEFT: 2pt; PADDING-RIGHT: 2pt; PADDING-TOP: 2pt">
+
+<div class="yToolbar" ID="ParaToolbar">
+  <div class="TBHandle"></div>
+  <select ID="ParagraphStyle" class="TBGen" TITLE="段落格式" LANGUAGE="javascript" onchange="format('formatBlock',this[this.selectedIndex].value);this.selectedIndex=0">
+    <option class="heading" selected>段落 
+    <option value="<P>">普通 
+    <option value="<H1>">标题1 &lt;H1&gt; 
+    <option value="<H2>">标题2 &lt;H2&gt; 
+    <option value="<H3>">标题3 &lt;H3&gt; 
+    <option value="<H4>">标题4 &lt;H4&gt; 
+    <option value="<H5>">标题5 &lt;H5&gt; 
+    <option value="<H6>">标题6 &lt;H6&gt; 
+    <option value="<ADDRESS>">Address &lt;ADDR&gt; 
+    <option value="<PRE>">Formatted &lt;PRE&gt; 
+    <option style="COLOR: darkred" value="removeFormat">Remove Formatting</option>
+  </select>
+  <select ID="FontName" class="TBGen" TITLE="字体" LANGUAGE="javascript" onchange="format('fontname',this[this.selectedIndex].value);this.selectedIndex=0">
+    <option class="heading" selected>字体 
+    <option value="Arial">Arial 
+    <option value="Arial Black">Arial Black 
+    <option value="Arial Narrow">Arial Narrow 
+    <option value="Comic Sans MS">Comic Sans MS 
+    <option value="Courier New">Courier New 
+    <option value="System">System 
+    <option value="Times New Roman">Times New Roman 
+    <option value="Verdana">Verdana 
+    <option value="Wingdings">Wingdings</option>
+  </select>
+  <select ID="FontSize" class="TBGen" TITLE="字体大小" LANGUAGE="javascript" onchange="format('fontsize',this[this.selectedIndex].value);this.selectedIndex=0">
+    <option class="heading" selected>大小 
+    <option value="1">1 
+    <option value="2">2 
+    <option value="3">3 
+    <option value="4">4 
+    <option value="5">5 
+    <option value="6">6 
+    <option value="7">7</option>
+  </select>
+  <select ID="BackColor" class="TBGen" TITLE="背景色" LANGUAGE="javascript" onchange="format('backcolor',this[this.selectedIndex].value);this.selectedIndex=0">
+    <option class="heading" selected>背景色
+    <option style="background: red;" value="red">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</option>
+    <option style="background: orange;" value="orange">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</option>
+    <option style="background: yellow;" value="yellow">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</option>
+    <option style="background: blue;" value="blue">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</option>
+    <option style="background: green;" value="green">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</option>
+    <option style="background: black;" value="black">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</option>
+    <option style="background: gray;" value="gray">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</option>
+    <option style="background: white;" value="white">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</option>
+  </select>
+  <select ID="ForeColor" class="TBGen" TITLE="字体色" LANGUAGE="javascript" onchange="format('forecolor',this[this.selectedIndex].value);this.selectedIndex=0">
+    <option class="heading" selected>字体色
+    <option style="background: red;" value="red">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</option>
+    <option style="background: orange;" value="orange">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</option>
+    <option style="background: yellow;" value="yellow">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</option>
+    <option style="background: blue;" value="blue">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</option>
+    <option style="background: green;" value="green">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</option>
+    <option style="background: black;" value="black">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</option>
+    <option style="background: gray;" value="gray">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</option>
+    <option style="background: white;" value="white">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</option>
+  </select>
+  <div class="TBSep"></div>
+  <div ID="EditMode" class="TBGen" style="WIDTH: 150px" TITLE="编辑源码"> 
+    <input type=checkbox name="switchMode" LANGUAGE="javascript" onclick="setMode(switchMode.checked)">
+    编辑源码 </div>
+</div>
+
+<div class="yToolbar" ID="FormatToolbar">
+  <div class="TBHandle"></div>
+  <div class="Btn" TITLE="剪切" LANGUAGE="javascript" onclick="format('cut')"> 
+    <IMG class=Ico src="images/cut.gif" width="22" height="22"> </div>
+  <div class="Btn" TITLE="复制" LANGUAGE="javascript" onclick="format('copy')"> 
+    <IMG class=Ico src="images/copy.gif" width="22" height="22"> </div>
+  <div class="Btn" TITLE="粘贴" LANGUAGE="javascript" onclick="format('paste')"> 
+    <IMG class=Ico src="images/cpaste.gif" width="22" height="22"> </div>
+  <div class="TBSep"></div>
+  <div class="Btn" TITLE="粗体" LANGUAGE="javascript" onclick="format('bold');"> 
+    <IMG class=Ico src="images/bold.gif" width="22" height="22"> </div>
+  <div class="Btn" TITLE="斜体" LANGUAGE="javascript" onclick="format('italic')"> 
+    <IMG class=Ico src="images/italic.gif" width="22" height="22"> </div>
+  <div class="Btn" TITLE="带下划线" LANGUAGE="javascript" onclick="format('underline')"> 
+    <IMG class=Ico src="images/under.gif" width="22" height="22"> </div>
+  <div class="TBSep"></div>
+  <div class="Btn" TITLE="靠左" NAME="Justify" LANGUAGE="javascript" onclick="format('justifyleft')"> 
+    <IMG class=Ico src="images/aleft.gif" width="22" height="22"> </div>
+  <div class="Btn" TITLE="居中" NAME="Justify" LANGUAGE="javascript" onclick="format('justifycenter')"> 
+    <IMG class=Ico src="images/center.gif" width="22" height="22"> </div>
+  <div class="Btn" TITLE="靠右" NAME="Justify" LANGUAGE="javascript" onclick="format('justifyright')"> 
+    <IMG class=Ico src="images/aright.gif" width="22" height="22"> </div>
+  <div class="TBSep"></div>
+  <div class="Btn" TITLE="编号" LANGUAGE="javascript" onclick="format('insertorderedlist')"> 
+    <IMG class=Ico src="images/nlist.gif" width="22" height="22"> </div>
+  <div class="Btn" TITLE="项目符号" LANGUAGE="javascript" onclick="format('insertunorderedlist')"> 
+    <IMG class=Ico src="images/blist.gif" width="22" height="22"> </div>
+  <div class="TBSep"></div>
+  <div class="Btn" TITLE="减少缩进量" LANGUAGE="javascript" onclick="format('outdent')"> 
+    <IMG class=Ico src="images/ileft.gif" width="22" height="22"> </div>
+  <div class="Btn" TITLE="增加缩进量" LANGUAGE="javascript" onclick="format('indent')"> 
+    <IMG class=Ico src="images/iright.gif" width="22" height="22" > </div>
+  <div class="TBSep"></div>
+  <div class="Btn" TITLE="创建链接" LANGUAGE="javascript" onclick="createLink()"> 
+    <IMG class=Ico src="images/wlink.gif" width="22" height="22" > </div>
+</div>
+
+<IFRAME class="HtmlEditor" width="100%" ID="HtmlEditor" height="190">
+
+</IFRAME>
+
+<SCRIPT>
+<!--
+HtmlEditor.document.open();
+HtmlEditor.document.write(bodyStyle);
+HtmlEditor.document.close();
+HtmlEditor.document.designMode="On";
+
+// -->
+</SCRIPT>
+
+<SCRIPT LANGUAGE="JAVASCRIPT" SRC="editfunc.js?169">
+</SCRIPT>
+
+</body>
+</html>
